@@ -4,6 +4,10 @@ NodeJS轻量实现的CAS Client，支持接入CAS 2.0+的服务。
 
 从https://github.com/acemetrix/connect-cas优化修改而来。
 
+## VERSION
+
+0.2.2 Alpha
+
 ## 安装
 
     npm install nodejs-cas
@@ -125,6 +129,8 @@ router.route('/jobs/:jobId')
 ## 注意
 1. 对于Https的一些实现细节并未实现，目前仅支持http请求。
 2. 使用session时必须使用sessionStore，如果仅想在内存中实现session，推荐使用配套的session store实现`session-memory-store`。
+3. Project is working in progress, be care if you want to use it in production environment.
+   项目仍在开发中，如需要在生产环境使用，请小心谨慎！
 
 ## License
 
