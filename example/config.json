@@ -1,0 +1,6 @@
+{
+  "servicePrefix": "yourServicePrefix",
+  "servicePort": "8080",
+  "casServicePrefix": "cas service prefix",
+  "ciServerPrefix": "other service prefix"
+}

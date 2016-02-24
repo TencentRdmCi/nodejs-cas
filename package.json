@@ -1,0 +1,41 @@
+{
+  "name": "nodejs-cas",
+  "version": "0.2.1",
+  "description": "NodeJS implement of CAS(Central Authentication Service) client.",
+  "main": "index.js",
+  "directories": {
+    "lib": "./lib"
+  },
+  "dependencies": {
+    "lodash": "^2.4.2",
+    "session-memory-store": "^0.2.0",
+    "node-cache": "^3.1.0",
+    "q": "^1.0.1",
+    "request": "^2.30.0",
+    "xml2js": "^0.4.16"
+  },
+  "devDependencies": {
+    "body-parser": "^1.0.2",
+    "cookie-parser": "^1.4.1",
+    "cookie-session": "^1.2.0",
+    "error-handler": "^0.1.4",
+    "express": "~4.1.1",
+    "express-session": "^1.13.0",
+    "jade": "~0.31.2",
+    "method-override": "^1.0.0",
+    "morgan": "^1.0.0"
+  },
+  "scripts": {
+    "example": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/TencentRdmCi/nodejs-cas.git"
+  },
+  "author": "vinsonxiao",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/TencentRdmCi/nodejs-cas/issues"
+  },
+  "homepage": "https://github.com/TencentRdmCi/nodejs-cas#readme"
+}
