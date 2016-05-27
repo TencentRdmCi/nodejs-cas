@@ -1,22 +1,22 @@
 # nodejs-cas
 
-NodeJS轻量实现的CAS Client，支持接入CAS 2.0+的服务。
+CAS Client NodeJS implement，support CAS 2.0+ protocol.
 
-从https://github.com/acemetrix/connect-cas优化修改而来。
+Adapted from https://github.com/acemetrix/connect-cas。
 
 ## VERSION
 
-0.2.2 Alpha
+1.0.3
 
-## 安装
+## Install
 
     npm install nodejs-cas
             
-## 使用
+## Quick start
 
 ```javascript
 var express = require('express');
-var cas = require('nodejs-cas');
+var CasClient = require('nodejs-cas');
 var bodyParser = require('body-parser');
 var session = require('express-session');
 var cookieParser = require('cookie-parser');
@@ -31,28 +31,30 @@ app.use(session({
   store: new MemoryStore()  // or other session store
 }));
 
-/**
- *   cas config
- */
-cas.configure({
-  host: casServerHost,
-  hostname: casServiceHostname,
-  protocol: casServiceProtocal,
-  port: casServicePort,
+var cas = new CasClient({
+  path: 'https://cas.xx.com/cas',
+  ajaxHeader: 'x-client-fetch',
+  servicePrefix: 'http://your.service.path.com',
+
+  ignore: [
+    function(path, req) {
+      return path.indexOf('somePathYourWantToIgnore') > -1;
+    },
+    'static/style.css',
+    /static\/*/
+  ],
   paths: {
     validate: '/cas/validate',
     serviceValidate: '/cas/serviceValidate',
     proxy: '/cas/proxy',
     login: '/cas/login',
-    logout: '/cas/logout'
+    logout: '/cas/logout',
+    proxyCallback: '/cas/proxyCallback'
   }
-});
+})
 
-app.use(cas.serviceValidate({
-  // 如果不是代理模型，不可以设置这个pgtUrl
-  pgtUrl: '/cas/proxyCallback'
-}))
-  .use(cas.ssout('/cas/validate'))  // 如果不需要启用单点登出，不要使用该中间件
+app.use(cas.serviceValidate())
+  .use(cas.ssout())  // Only if you need to SSOFF(single sign off)
   .use(cas.authenticate());
 
 app.get('/logout', function (req, res) {
@@ -63,74 +65,156 @@ app.get('/logout', function (req, res) {
   req.session.destroy();
 
   var options = cas.configure();
-  options.pathname = options.paths.logout;
-  options.query = {
-    service: config.servicePrefix
-  };
-  return res.redirect(url.format(options));
+
+  return res.redirect(options.path + options.paths.logout + '?service=' + encodeURIComponent('http://your.service.path.com'));
 });
 ```
 
-## cas.configure支持配置
-
-基本是参考Node自带URL模块的方式：
-
-  - `procotol` CAS服务的协议。 默认：'https'。
-  - `host` CAS服务的服务名。
-  - `port` CAS服务的端口号。 默认：443。
-  - `gateway` CAS gateway地址。默认：false.
-  - `paths`
-    - `validate` CAS Client接收校验请求的地址。默认： /cas/validate。
-                 既登录时传递给Cas Server的service字段的后缀，登录时传递字段如： service=http://your.client.host/cas/validate
-    - `serviceValidate` Cas server校验登陆st的路径。默认：/cas/serviceValidate
-    - `proxy` proxy模型下，向Cas Server要访问其他service的pt的路径。默认： /cas/proxy
-    - `login` 向Cas Server登录的路径。默认： /cas/login
-    - `logout` 向Cas Server登出的路径。默认： /cas/logout
-
-## 代理（proxy）模型
-
-代理模型下，在调用cas.serviceValidate中间件时，必须设置pgtUrl参数，中间件在登录后校验st时，传递pgtUrl给serviceValidate所设置的校验地址。
-
-```javascript
-app.use(cas.serviceValidate({
-  // 代理模型下，必须设置pgtUrl
-  pgtUrl: '/cas/proxyCallback'
-}))
-```
-
-## 代理（proxy）模型下，获取pgt（proxy-granting ticket）
-
-调用cas.proxyTicket中间件，会自动向cas server索要pgt，获得pgt后会将其附在req.pt上并传递给下面的中间件。
-
-如：
+## Constructor
 
 ```javascript
 
-// 为所有请求都索要pgt
-app.use(cas.proxyTicket({
-  targetService: serviceYouNeedToAccess // 需要访问的服务的validate路径，如: http://some/server/shiro-cas
-}))
+var casClient = new CasClient(options);
 
-// 仅为特定路由索要pgt
-router.route('/jobs/:jobId')
-  .all(cas.proxyTicket({
-     targetService: serviceYouNeedToAccess
-   }))
-  .get(function (req, res) {
-    // 通过req.pt拿到pgt，然后将其附在下游服务的请求地址后，如：xxxx?ticket=req.pt
-    // do your bussinuess then
-
-    res.send(result);
-  });
 ```
 
-#### 一个完整的示例请访问/example， 配置config.json，并执行`node index.js`。
+### options
 
-## 注意
-1. 对于Https的一些实现细节并未实现，目前仅支持http请求。
-2. 使用session时必须使用sessionStore，如果仅想在内存中实现session，推荐使用配套的session store实现`session-memory-store`。
-3. Project is working in progress, be care if you want to use it in production environment.
-   项目仍在开发中，如需要在生产环境使用，请小心谨慎！
+#### options.path {String} (Required)
+
+The path of your CAS server. For example: https://www.your-cas-server-path.com/cas
+
+#### options.servicePrefix {String} (Required)
+
+The root path of your CAS client(Your website).
+
+Every paths that for your CAS client will use this path as the root path.
+
+For example: We will send `${options.servicePrefix}${options.paths.validate}` as `service` parameter to the login page. Then after login CAS server will redirect to `${options.servicePrefix}${options.paths.validate}` to validate the ST.
+
+#### options.ignore {Array} (Optional, default: [])
+
+In some cases, you don't need all request to be authenticated by the CAS. So you can set the ignore rules, when some rules matched, we will simply call the `next()` function and do nothing.
+
+We support String rules, RegExp rules and Function rules.
+
+For example, we checked the rules like:
+
+1. String rules:
+
+```javascript
+if (req.path.indexOf(stringRule) > -1) next();
+```
+
+2. Reg rules:
+
+```javascript
+if (regRule.test(req.path)) next();
+```
+
+3. Function rules:
+```javascript
+if (funcRule(req.path, req)) next();
+```
+
+#### options.paths {Object} (Optional, default: {})
+Relative paths to specific all functional paths to the CAS protocol. If you havn't modified the APIs of your CAS server, you may don't need to set this option. (In proxy mode, you must set the options.paths.proxyCall)
+
+#### options.paths.validate (String) (Optional, default: '/cas/validate')
+(For CAS Client)
+
+The path you want your CAS client to validate ST from the CAS server. And we'll use `${options.servicePrefix}${options.paths.validate}` as `service` parameter to any CAS server's APIs that need this `service`.
+
+#### options.paths.serviceValidate (String) (Optional, default: '/cas/serviceValidate')
+(For CAS Server)
+
+The path your CAS Server validate a ST. CAS client will send request to `${options.servicePrefix}${options.paths.serviceValidate}` to validate a ST.
+
+#### options.paths.proxy (String) (Optional, default: '/cas/proxy')
+(For CAS Server)
+
+In proxy mode, you need a PGT(proxy granting ticket) to communicate with other server, you can get a PGT form this path: `${options.servicePrefix}${options.paths.proxy}`.
+
+#### options.paths.login (String) (Optional, default: '/cas/login')
+(For CAS Server)
+
+The login path of your CAS server.
+
+#### options.paths.logout (String) (Optional, default: '/cas/logout')
+(For CAS Server)
+
+The logout path of your CAS server.
+
+#### options.paths.proxyCallback (String) (Optional, default: '')
+(For CAS Client)
+In proxy mode, setting this path means you want this path of your CAS Client to receive the callback from CAS Server(Proxy mode) to receive the PGTIOU and PGTID.
+
+In none-proxy mode, don't set this option!
+
+#### options.ajaxHeader {String} (Optional, default: '')
+Because an AJAX request can't notice 302 redirect response, and will directly redirect under the hook without telling you anything.
+
+So when your user's authentication is expired, and your CAS Client and CAS Server is not in the same domain, (In most cases they won't be the same domain) when they send an AJAX request, oops, an not-allowed-cross-domain exception will occur!
+
+To prevent this embarrassing situation, we add this option. So send all AJAX request with the header you set.
+
+For example: options.ajaxHeader = 'x-client-ajax', then send header: x-client-ajax=true with the AJAX request.
+
+Then we'll know this request is an AJAX request, and when the authentication is expired, we will send a `418` TEAPOT statusCode other than `302` to the login page, you need to handle this status code, and tell your user to refresh the page or what to do.
+
+#### options.debug {Boolean} (Optional, default: false)
+For debug usage, we will log every step when CAS client is interacting with CAS server.
+
+### METHOD
+
+#### CasClient.proxyTicket(pgt, targetService, callback)
+
+In proxy mode, request a ticket from CAS server to interact with targetService.
+
+You can receive the ticket by passing a callback function which will be called like: `callback(error, ticket)`, besides, CasClient.proxyTicket will also return a promise,
+when resolved, it will pass `ticket` to the resolve function, then you can send it as ticket parameter to request to the other server.
+
+Example:
+```javascript
+    // In promise way
+    CasClient.proxyTicketPromise(req.session.pgt, 'http://your-target-service.com')
+      .then(function(ticket) {
+        // Then you can send reqeust with parameter ticket http://your-target-service.com/some/path?ticket=${ticket}
+      })
+      .catch(function(err) {
+        throw err
+      });
+
+    // or callback
+    CasClient.proxyTicketPromise(req.session.pgt, 'http://your-target-service.com', function(error, ticket) {
+      if (error) throw error;
+      // Then you can send reqeust with parameter ticket http://your-target-service.com/some/path?ticket=${ticket}
+    });
+```
+
+### PROXY MODE
+In proxy mode, at first you need to set options.paths.proxyCallback, when the proxy-mode-login is finished, you can access a value called `pgt` on req.session.pgt.
+
+By using this `pgt`, you can get a ticket from CAS server by calling `CasClient.proxyTicket`.
+
+### NONE-PROXY MODE
+In none-proxy mode, don't set options.paths.proxyCallback, when all middle-ware passed, that means the login succeed.
+
+## CHANGE LOG
+
+#### 1.0.2
+Restructure code, use constructor to initialize CasClient, change some options.
+
+#### From 0.2.x to 1.0.x
+In 1.0.x, you need to new an CAS-Client instance instead of calling them as static method in 0.2.x. We change options a lot to make it more easier to config and use.
+
+We remove the 'other domain proxyCallback' feature and custom 'pgtFn' which you can handle pgtIou and pgtId yourself, because we find out that we can rarely use them and it'll make it more complicated to understand and use if you're not familiar with CAS Protocol.
+
+We combined the static functions: proxyTicketPromise and proxyTicket into one function `proxyTicket` which can both use a promise way or callback way.
+
+## More
+
+Currently we use this project in our production environment, and it works fine with our CAS Server. If you're facing any issues, please make us know!
 
 ## License
 
