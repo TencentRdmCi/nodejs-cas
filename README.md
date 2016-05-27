@@ -6,7 +6,7 @@ Adapted from https://github.com/acemetrix/connect-cas。
 
 ## VERSION
 
-1.0.3
+1.0.5
 
 ## Install
 

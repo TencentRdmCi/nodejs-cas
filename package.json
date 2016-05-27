@@ -1,51 +1,4 @@
 {
-  "_args": [
-    [
-      "nodejs-cas@^0.2.2",
-      "/Users/xyz/Sites/tencent/beta2.0/beta2.0"
-    ],
-    [
-      "nodejs-cas@0.2.4",
-      "/Users/xyz/Sites/tencent/beta2.0/beta2.0"
-    ],
-    [
-      "nodejs-cas@1.0.2",
-      "/Users/xyz/Sites/tencent/beta2.0/beta2.0"
-    ]
-  ],
-  "_cnpm_publish_time": 1461751821615,
-  "_from": "nodejs-cas@1.0.2",
-  "_id": "nodejs-cas@1.0.2",
-  "_inCache": true,
-  "_installable": true,
-  "_location": "/nodejs-cas",
-  "_nodeVersion": "4.4.2",
-  "_npmOperationalInternal": {
-    "host": "packages-16-east.internal.npmjs.com",
-    "tmp": "tmp/nodejs-cas-1.0.2.tgz_1464336157398_0.6929280003532767"
-  },
-  "_npmUser": {
-    "email": "xiaoyuze88@gmail.com",
-    "name": "xiaoyuze88"
-  },
-  "_npmVersion": "3.8.2",
-  "_phantomChildren": {
-    "strict-uri-encode": "1.1.0"
-  },
-  "_requested": {
-    "name": "nodejs-cas",
-    "raw": "nodejs-cas@1.0.2",
-    "rawSpec": "1.0.2",
-    "scope": null,
-    "spec": "1.0.2",
-    "type": "version"
-  },
-  "_requiredBy": [
-    "/"
-  ],
-  "_shrinkwrap": null,
-  "_spec": "nodejs-cas@1.0.2",
-  "_where": "/Users/xyz/Sites/tencent/beta2.0/beta2.0",
   "author": {
     "name": "vinsonxiao"
   },
@@ -64,13 +17,6 @@
   "directories": {
     "lib": "./lib"
   },
-  "dist": {
-    "key": "/nodejs-cas/-/nodejs-cas-0.2.4.tgz",
-    "noattachment": false,
-    "shasum": "c2e2dcb2601254cd3763c8515efd45120c885fd0",
-    "size": 29072,
-    "tarball": "https://registry.npmjs.org/nodejs-cas/-/nodejs-cas-1.0.2.tgz"
-  },
   "gitHead": "ba2dd45673631febefa9ecfd2e3fcc6f12372e0d",
   "homepage": "https://github.com/TencentRdmCi/nodejs-cas#readme",
   "license": "MIT",
@@ -84,7 +30,6 @@
   "name": "nodejs-cas",
   "optionalDependencies": {},
   "publish_time": 1461751821615,
-  "readme": "ERROR: No README data found!",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/TencentRdmCi/nodejs-cas.git"
@@ -92,5 +37,5 @@
   "scripts": {
     "example": ""
   },
-  "version": "1.0.3"
+  "version": "1.0.5"
 }
