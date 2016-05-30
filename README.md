@@ -64,7 +64,7 @@ app.get('/logout', function (req, res) {
 
   req.session.destroy();
 
-  var options = cas.configure();
+  var options = cas.options;
 
   return res.redirect(options.path + options.paths.logout + '?service=' + encodeURIComponent('http://your.service.path.com'));
 });
