@@ -165,6 +165,12 @@ Then we'll know this request is an AJAX request, and when the authentication is 
 #### options.debug {Boolean} (Optional, default: false)
 For debug usage, we will log every step when CAS client is interacting with CAS server.
 
+#### options.redirect(req, res) {Function} (Optional, default: null)
+Change the default behaviour that after user login or login failed, CAS redirect to the last url.
+
+If you return `true` from this redirect function, then CAS won't redirect to the last url, (So make sure you send a response in your function.)
+otherwise, CAS just keep the same logic that will redirect to the last url after user login or login failed.
+
 ### METHOD
 
 #### CasClient.proxyTicket(pgt, targetService, callback)
@@ -201,6 +207,9 @@ By using this `pgt`, you can get a ticket from CAS server by calling `CasClient.
 In none-proxy mode, don't set options.paths.proxyCallback, when all middle-ware passed, that means the login succeed.
 
 ## CHANGE LOG
+
+#### 1.0.9
+Add new option `redirect`, to change the default logic that CAS will redirect to the last url after login. 
 
 #### 1.0.2
 Restructure code, use constructor to initialize CasClient, change some options.
