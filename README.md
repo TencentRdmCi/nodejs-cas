@@ -6,7 +6,7 @@ Adapted from https://github.com/acemetrix/connect-cas。
 
 ## VERSION
 
-1.0.5
+1.0.10
 
 ## Install
 
@@ -208,7 +208,7 @@ In none-proxy mode, don't set options.paths.proxyCallback, when all middle-ware 
 
 ## CHANGE LOG
 
-#### 1.0.9
+#### 1.0.10
 Add new option `redirect`, to change the default logic that CAS will redirect to the last url after login. 
 
 #### 1.0.2
