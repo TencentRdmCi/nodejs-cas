@@ -13,7 +13,14 @@
     "xml2js": "^0.4.16"
   },
   "description": "NodeJS implement of CAS(Central Authentication Service) client.",
-  "devDependencies": {},
+  "devDependencies": {
+    "body-parser": "^1.15.1",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.4.2",
+    "express": "^4.13.4",
+    "express-session": "^1.13.0",
+    "session-memory-store": "^0.2.1"
+  },
   "directories": {
     "lib": "./lib"
   },
@@ -35,7 +42,7 @@
     "url": "git+https://github.com/TencentRdmCi/nodejs-cas.git"
   },
   "scripts": {
-    "example": ""
+    "start": "node ./example"
   },
-  "version": "1.0.10"
+  "version": "1.0.11"
 }
