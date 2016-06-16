@@ -6,7 +6,10 @@ Adapted from https://github.com/acemetrix/connect-cas。
 
 ## VERSION
 
-1.0.11
+1.0.12
+
+## Deprecated
+This project will no longer be updated, try [connect-cas2](https://www.npmjs.com/package/connect-cas2) instead.
 
 ## Install
 

@@ -44,5 +44,5 @@
   "scripts": {
     "start": "node ./example"
   },
-  "version": "1.0.11"
+  "version": "1.0.12"
 }
